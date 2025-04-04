@@ -196,7 +196,7 @@ curl -X POST http://localhost:8000/products/ \
 
 ## Contributors
 
-- Your Name (lincolnmotlalepula@gmail.com)
+- Lincoln (lincolnmotlalepula@gmail.com)
 
 ## License
 
