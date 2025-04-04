@@ -17,7 +17,7 @@ class IsProductOwner(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        return request.user.is_authenticated and hasattr(request.user, 'vendor_profile') and obj.vendor == request.user.vendor_profile
+        return request.user.is_authenticated and hasattr(request.user, 'vendor_profile') and obj.vendor == request.user.vendor_profile and obj.vendor.user == request.user
 
 
 class IsReviewAuthor(permissions.BasePermission):

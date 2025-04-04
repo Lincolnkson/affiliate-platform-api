@@ -79,56 +79,6 @@ class VendorViewSet(viewsets.ModelViewSet):
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
-# # Product views
-# class ProductViewSet(viewsets.ModelViewSet):
-#     queryset = Product.objects.all()
-    
-#     def get_serializer_class(self):
-#         if self.action == 'create':
-#             return ProductCreateSerializer
-#         return ProductSerializer
-    
-#     def get_permissions(self):
-#         if self.action in ['list', 'retrieve']:
-#             self.permission_classes = [AllowAny]
-#         elif self.action == 'create':
-#             self.permission_classes = [IsVendor]
-#         else:
-#             self.permission_classes = [IsProductOwner | IsAdmin]
-#         return super().get_permissions()
-    
-#     @action(detail=True, methods=['post'])
-#     def add_category(self, request, pk=None):
-#         product = self.get_object()
-#         serializer = CategorySerializer(data=request.data)
-        
-#         if serializer.is_valid():
-#             category = serializer.validated_data['category']
-#             if not ProductCategory.objects.filter(product=product, category=category).exists():
-#                 ProductCategory.objects.create(product=product, category=category)
-#                 return Response({"message": "Category added"}, status=status.HTTP_201_CREATED)
-#             return Response({"message": "Category already exists"}, status=status.HTTP_400_BAD_REQUEST)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# Product views
-
-from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView
-
-# Add these views to your existing views.py
-class ProductPartialUpdateView(RetrieveUpdateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsProductOwner | IsAdmin]
-    http_method_names = ['get', 'patch']  # Only allow GET and PATCH
-
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-class ProductDeleteView(DestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsProductOwner | IsAdmin]
-    http_method_names = ['delete']  # Only allow DELETE
-    
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     
@@ -147,15 +97,22 @@ class ProductViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = [IsAuthenticated]  # Default for any other actions
         return super().get_permissions()
+
+    @action(detail=True, methods=['patch'], url_path='update-product')
+    def update_product(self, request, pk=None):
+        product = self.get_object()
+        serializer = ProductSeri
+        alizer(product, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # Add explicit partial_update handler if you need custom behavior
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
-    
-    # Add explicit destroy handler if you need custom behavior
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
-    
+    @action(detail=True, methods=['delete'], url_path='delete-product')
+    def delete_product(self, request, pk=None):
+        product = self.get_object()
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)    
 
     
     @action(detail=True, methods=['post'])
