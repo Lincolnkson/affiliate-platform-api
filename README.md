@@ -1,4 +1,4 @@
-# Affiliate Marketing Platform
+# Affiliate Marketing Platform API
 
 A comprehensive affiliate marketing platform built with Django REST Framework and MySQL. This platform connects vendors, affiliates, and customers in an efficient ecosystem.
 
